@@ -11,6 +11,10 @@ void GUIContoller::start(){
     main->addToolBarButton(&newFile, "New",  QPixmap(":/icons/icons/new.png"));
     main->addToolBarButton(&openFolder, "Open",  QPixmap(":/icons/icons/open.png"));
     main->addToolBarButton(&saveFile, "Save",  QPixmap(":/icons/icons/save.png"));
+    main->addToolBarButton(&minify, "Minify",  QPixmap(":/icons/icons/minify.png"));
+    main->addToolBarButton(&beautify, "Beautify",  QPixmap(":/icons/icons/beautify.png"));
+    main->addToolBarButton(&showSynsetInfo, "Info",  QPixmap(":/icons/icons/search.png"));
+    main->addToolBarButton(&convert2JSON, "Convert To Json",  QPixmap(":/icons/icons/convert.png"));
     main->addToolBarSpacer();
     main->addToolBarButton(&showSettings, "Settings",  QPixmap(":/icons/icons/Settings.png"));
 
@@ -20,7 +24,6 @@ void GUIContoller::start(){
 
     connect(main->dirViewer, &DirectoryViewer::doubleClicked, &openFile);
     connect(main->editorTabWidget, &QTabWidget::tabCloseRequested, &EditorController::closeEditor);
-
 }
 
 void GUIContoller::openFolder(){
@@ -43,7 +46,8 @@ void GUIContoller::newFile(){
 }
 
 void GUIContoller::openFile(QString path){
-    EditorController::addEditor(path);
+    if(EditorController::addEditor(path))
+        main->editorTabWidget->setCurrentIndex(main->editorTabWidget->count()-1);
 }
 
 void GUIContoller::saveFile(){
@@ -55,6 +59,34 @@ void GUIContoller::saveFile(){
              f.close();
              main->status->showMessage("File Saved",2000);
          }
+    }
+}
+
+void GUIContoller::minify(){
+    if(main->editorTabWidget->count()){
+        EditorController::EditorFile ef = EditorController::getActiveEditorFile();
+        emit(ef.editor->minify());
+    }
+}
+
+void GUIContoller::beautify(){
+    if(main->editorTabWidget->count()){
+        EditorController::EditorFile ef = EditorController::getActiveEditorFile();
+        emit(ef.editor->beautify());
+    }
+}
+
+void GUIContoller::convert2JSON(){
+    if(main->editorTabWidget->count()){
+        EditorController::EditorFile ef = EditorController::getActiveEditorFile();
+        emit(ef.editor->convertToJson());
+    }
+}
+
+void GUIContoller::showSynsetInfo(){
+    if(main->editorTabWidget->count()){
+        EditorController::EditorFile ef = EditorController::getActiveEditorFile();
+        emit(ef.editor->showSynsetInfo());
     }
 }
 

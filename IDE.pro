@@ -1,4 +1,4 @@
-QT       += core gui serialport
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,31 +16,52 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Controllers/Langs/langcontroller.cpp \
     Controllers/editorcontroller.cpp \
     Controllers/guiController.cpp \
-    Controllers/xmlcontroller.cpp \
+    Controllers/Langs/xmlcontroller.cpp \
     GUI/settings.cpp \
+    GUI/synsetinfo.cpp \
     Highlighter/highlighter.cpp \
     Highlighter/htmlhighlighter.cpp \
     GUI/xml_Editor.cpp \
+    Highlighter/jsonhighlighter.cpp \
     Highlighter/xmlHighlighter.cpp \
     main.cpp \
     GUI/editor.cpp \
     GUI/directoryviewer.cpp \
+    sqliteDriver/sqlite.cpp \
+    Core/data_tree.cpp \
+    Core/files_converter.cpp \
+    Core/Block/block.cpp \
+    Core/Block/object_block.cpp \
+    Core/Block/string_block.cpp \
     Highlighter/pythonhighlighter.cpp
 
 HEADERS += \
+    Controllers/Langs/langcontroller.h \
     Controllers/editorcontroller.h \
     Controllers/guiController.h \
-    Controllers/xmlcontroller.h \
+    Controllers/Langs/xmlcontroller.h \
     GUI/settings.h \
+    GUI/synsetinfo.h \
     Highlighter/highlighter.h \
     Highlighter/htmlHighlighter.h \
     GUI/editor.h \
     GUI/directoryviewer.h \
+    Highlighter/jsonhighlighter.h \
     Highlighter/pythonHighlighter.h \
     GUI/xml_Editor.h \
-    Highlighter/xmlHighlighter.h
+    sqliteDriver/sqlite.h \
+    Core/data_tree.h \
+    Core/files_converter.h \
+    Core/Block/block.h \
+    Core/Block/object_block.h \
+    Core/Block/string_block.h \
+    Highlighter/xmlHighlighter.h \
+    Data_Structures/map_vector.h \
+    Data_Structures/trie.h \
+    Data_Structures/trie_node.h \
 
 RESOURCES += \
     resources.qrc

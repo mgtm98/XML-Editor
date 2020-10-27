@@ -6,6 +6,9 @@
 #include <QTextBlock>
 #include <QtDebug>
 #include <QSyntaxHighlighter>
+#include <QCompleter>
+#include <QAbstractItemView>
+#include <QScrollBar>
 
 class LineNumberArea;
 
@@ -13,45 +16,52 @@ class Editor : public QPlainTextEdit{
     Q_OBJECT
 
 public:
-    struct lineHiighLight{
-        int line;
-        QColor color;
-    };
     Editor(QWidget *parent = nullptr);
     Editor(QSyntaxHighlighter*,QWidget*);
-    void lineNumberPaintEvent (QPaintEvent *e);
-    int lineNumberWidth();
-    void highlightLine(int);
-    void highlightMultiLine(QMap<int,QColor>);
-    int getInstNumber(int);
-    void mapLineToInst(int);
+    void setCompleter(QCompleter *c);
+    void setHighlighterCurrentLine(bool &s);
+    void setHighlighterCurrentLineColor(QColor &c);
+    void setTabWidth(int);
+    void highlightLine(int, QColor &&);
     void reset();
-    void setHighlighColor(QColor);
+    QString textUnderCursor();
     ~Editor();
+
+// Made for xml editor project 2020 3rd Computer
+signals:
+    void beautify();
+    void minify();
+    void showSynsetInfo();
+    void convertToJson();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
-
-private slots:
-    void updateNumAreaWidth(int);
-    void highlightCurrentLine();
-    void updateNumArea(const QRect &, int);
-
+    void focusInEvent(QFocusEvent *e) override;
+    void keyPressEvent(QKeyEvent *e) override;
 
 private:
     LineNumberArea *numArea;
     QSyntaxHighlighter *pyHighlightrt;
-    QMap<int,int> *instTable;
-    QColor color;
-    int maxInstructionNumbers;
+    QColor currentLineHighlighterColor = QColor(Qt::white);
+    bool isHighlightCurrentLine = false;
+    QCompleter *completer = nullptr;
+
     void initFont();
+    void updateNumAreaWidth(int);
+    void highlightCurrentLine();
+    void updateNumArea(const QRect &, int);
+    void lineNumberPaintEvent(QPaintEvent *e);
+    int lineNumberWidth();
+    void insertCompletion(const QString &completion);
+
+friend class LineNumberArea;
 };
 
 class LineNumberArea : public QWidget{
     Q_OBJECT
+
 public:
     LineNumberArea(Editor *editor) : QWidget(editor) {
-
         codeEditor = editor;
     }
 
@@ -63,7 +73,6 @@ protected:
     void paintEvent(QPaintEvent *event) override {
         codeEditor->lineNumberPaintEvent(event);
     }
-
 private:
     Editor *codeEditor;
 };

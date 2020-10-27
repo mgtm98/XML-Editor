@@ -2,6 +2,8 @@
 DirectoryViewer::DirectoryViewer(QWidget *parent):DirectoryViewer("/",parent){
 }
 
+#include <QDebug>
+
 DirectoryViewer::DirectoryViewer(QString path, QWidget *parent):QTreeView(parent){
     fmodel = new QFileSystemModel(this);
     fmodel->setRootPath(path);
@@ -15,7 +17,9 @@ DirectoryViewer::DirectoryViewer(QString path, QWidget *parent):QTreeView(parent
     this->header()->hide();
 
 
+
     QFile configFile(QString(CONFIG_PATH)+"config.txt");
+    qDebug() << QGuiApplication::platformName();
     if(configFile.exists()){
         configFile.open(QIODevice::ReadWrite);
         workspacePath = configFile.readLine();

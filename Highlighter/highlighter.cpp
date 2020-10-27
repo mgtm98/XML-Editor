@@ -1,12 +1,16 @@
 #include "highlighter.h"
 
-QTextCharFormat Highlighter::format(const QColor &color, const QString &style){
+QTextCharFormat Highlighter::format(const QColor &color, Format f){
     QTextCharFormat format;
     format.setForeground(color);
-    if(style.contains("bold"))
+    if(f == Format::BOLD){
         format.setFontWeight(QFont::Bold);
-    if(style.contains("italic"))
+    }else if(f == Format::ITALIC){
         format.setFontItalic(true);
+    }else if(f == Format::BOLD_ITALIC){
+        format.setFontWeight(QFont::Bold);
+        format.setFontItalic(true);
+    }
     return format;
 }
 

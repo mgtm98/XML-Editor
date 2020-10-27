@@ -1,2 +1,2 @@
 # uPython-IDE
-qt5 c++ ide for micropython
+qt5 c++ ide for XML

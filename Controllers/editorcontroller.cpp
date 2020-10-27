@@ -1,4 +1,4 @@
-#include "editorcontroller.h"
+﻿#include "editorcontroller.h"
 
 MainWindow *EditorController::main;
 QMap <QString, EditorController::EditorFile*> EditorController::activeFiles;
@@ -7,7 +7,8 @@ void EditorController::registerMainWindow(MainWindow *m){
     main = m;
 }
 
-void EditorController::addEditor(QString path){
+bool EditorController::addEditor(QString path){
+    main->setCursor(Qt::WaitCursor);
     QString name = path.mid(path.lastIndexOf("/")+1, path.size());
     QString type = path.mid(path.lastIndexOf(".")+1, path.size()-path.lastIndexOf("."));
     if(!path.compare(type)) type = "";
@@ -17,6 +18,7 @@ void EditorController::addEditor(QString path){
     if(type.size() == 0) tabName = name;
     else tabName = name + "." + type;
 
+    if(activeFiles.contains(tabName)) return false;
     QDir dir(path);
     if(!dir.exists()){
         QFile f(path);
@@ -31,13 +33,17 @@ void EditorController::addEditor(QString path){
         eFile->editor = e;
         eFile->filePath = path;
         activeFiles.insert(tabName,eFile);
-        setSyntaxController(type,e);
+        setSyntaxController(type,e,eFile);
     }
+    main->setCursor(Qt::ArrowCursor);
+    return true;
 }
 
 void EditorController::closeEditor(int index){
     QString editorName = main->editorTabWidget->tabText(index);
-     main->editorTabWidget->removeTab(index);
+    main->editorTabWidget->removeTab(index);
+    LangController *cont = activeFiles.value(editorName)->langController;
+    if(cont != nullptr) delete cont;
     delete activeFiles.value(editorName);
     activeFiles.remove(editorName);
 }
@@ -48,6 +54,7 @@ EditorController::EditorFile EditorController::getActiveEditorFile(){
         QString activeFile = main->editorTabWidget->tabText(main->editorTabWidget->currentIndex());
         ef.filePath = activeFiles.value(activeFile)->filePath;
         ef.editor = activeFiles.value(activeFile)->editor;
+        ef.langController = activeFiles.value(activeFile)->langController;
     }
     return ef;
 }
@@ -56,7 +63,9 @@ QPixmap EditorController::Icon(QString &type){
     if(!type.compare("py")){
         return QPixmap(":/icons/icons/python.png");
     }else if(!type.compare("xml")){
-        return QPixmap(":/icons/icons/xmlIcon.png");
+        return QPixmap(":/icons/icons/xml.svg");
+    }else if(!type.compare("json")){
+        return QPixmap(":/icons/icons/json.svg");
     }else{
         return QPixmap(":/icons/icons/txt.png");
     }
@@ -67,15 +76,24 @@ QSyntaxHighlighter* EditorController::Highlighter(QString &type){
         return new class::PythonHighlighter();
     }else if(!type.compare("xml")){
         return new XMLHighlighter;
+    }else if(!type.compare("json")){
+        return new JSONHighlighter;
     }else{
         return nullptr;
     }
 }
 
-void EditorController::setSyntaxController(QString &type, Editor *e){
+void EditorController::setSyntaxController(QString &type, Editor *e, EditorFile *efile){
     if(!type.compare("xml")){
-        XMLController *controller = new XMLController(e);
+        XMLController *controller = new XMLController(e, efile->filePath);
+        efile->langController = controller;
+        e->setTabWidth(3);
+        main->status->showMessage("Synsets Number : " + QString::number(controller->getSynsetNumber()), 10000);
         connect(e, &Editor::textChanged, controller, &XMLController::onTextChanged);
-        qDebug() << "Registerd";
+        connect(e, &Editor::beautify, controller, &XMLController::beautify);
+        connect(e, &Editor::minify, controller, &XMLController::minify);
+        connect(e, &Editor::showSynsetInfo, controller, &XMLController::showSynsetInfo);
+        connect(e, &Editor::convertToJson, controller, &XMLController::convert2JSON);
     }
 }
+

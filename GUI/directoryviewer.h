@@ -7,6 +7,7 @@
 #include <QFileSystemModel>
 #include <QHeaderView>
 #include <QFileDialog>
+#include <QGuiApplication>
 
 
 class DirectoryViewer : public QTreeView{
